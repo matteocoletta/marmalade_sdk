@@ -2,59 +2,77 @@
 
 This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [adjust.com].
 
-## Table of contents
+### Quick Start
 
-* [Example app](#example-app)
-* [Basic integration](#basic-integration)
-   * [Get the SDK](#sdk-get)
-   * [Add the SDK to your project](#sdk-add)
-   * [Integrate the SDK into your app](#sdk-integrate)
-   * [Adjust logging](#adjust-logging)
-   * [Adjust project settings](#adjust-project-settings)
-      * [Android permissions](#android-permissions)
-      * [Google Play Services](#android-gps)
-      * [Proguard settings](#android-proguard)
-      * [Android install referrer](#android-broadcast-receiver)
-      * [iOS frameworks](#ios-frameworks)
-* [Additional features](#additional-features)
-   * [Event tracking](#event-tracking)
-      * [Revenue tracking](#revenue-tracking)
-      * [Revenue deduplication](#revenue-deduplication)
-      * [In-App Purchase verification](#iap-verification)
-      * [Callback parameters](#callback-parameters)
-      * [Partner parameters](#partner-parameters)
-   * [Session parameters](#session-parameters)
-      * [Session callback parameters](#session-callback-parameters)
-      * [Session partner parameters](#session-partner-parameters)
-      * [Delay start](#delay-start)
-   * [Attribution callback](#attribution-callback)
-   * [Session and event callbacks](#session-event-callbacks)
-   * [Disable tracking](#disable-tracking)
-   * [Offline mode](#offline-mode)
-   * [Event buffering](#event-buffering)
-   * [GDPR right to be forgotten](#gdpr-forget-me)
-   * [SDK signature](#sdk-signature)
-   * [Background tracking](#background-tracking)
-   * [Device IDs](#device-ids)
-      * [iOS advertising identifier](#di-idfa)
-      * [Google Play Services advertising identifier](#di-gps-adid)
-      * [Adjust device identifier](#di-adid)
-   * [User attribution](#user-attribution)
-   * [Push token](#push-token)
-   * [Pre-installed trackers](#pre-installed-trackers)
-   * [Deep linking](#deeplinking)
-      * [Standard deep linking scenario](#deeplinking-standard)
-      * [Deferred deep linking scenario](#deeplinking-deferred)
-      * [Deep linking setup for Android](#deeplinking-android)
-      * [Deep linking setup for iOS](#deeplinking-ios)
-      * [Reattribution via deep links](#deeplinking-reattribution)
-* [License](#license)
+  * [Example app](#example-app)
+  * [Basic integration](#basic-integration)
+      * [Get the SDK](#sdk-get)
+      * [Add the SDK to your project](#sdk-add)
+      * [Integrate the SDK into your app](#sdk-integrate)
+      * [Adjust logging](#adjust-logging)
+      * [Adjust project settings](#adjust-project-settings)
+        * [Android permissions](#android-permissions)
+        * [Google Play Services](#android-gps)
+        * [Proguard settings](#android-proguard)
+        * [Android install referrer](#android-broadcast-receiver)
+        * [iOS frameworks](#ios-frameworks)
+      * [SDK signature](#sdk-signature) 
 
-## <a id="example-app"></a>Example app
+### Deep Linking
+
+  * [Deep linking](#deeplinking)
+       * [Standard deep linking scenario](#deeplinking-standard)
+       * [Deferred deep linking scenario](#deeplinking-deferred)
+       * [Deep linking setup for Android](#deeplinking-android)
+       * [Deep linking setup for iOS](#deeplinking-ios)
+       * [Reattribution via deep links](#deeplinking-reattribution)
+
+### Event Tracking
+
+  * [Event tracking](#event-tracking)
+       * [Revenue tracking](#revenue-tracking)
+       * [Revenue deduplication](#revenue-deduplication)
+       * [In-App Purchase verification](#iap-verification)
+    
+### Custom Parameters
+     
+  * [Callback parameters](#callback-parameters)
+  * [Partner parameters](#partner-parameters)
+  * [Session parameters](#session-parameters)
+       * [Session callback parameters](#session-callback-parameters)
+       * [Session partner parameters](#session-partner-parameters)
+  * [Delay start](#delay-start) 
+  
+### Additional Features
+
+  * [Push token](#push-token)
+  * [Attribution callback](#attribution-callback)
+  * [User attribution](#user-attribution)
+  * [Session and event callbacks](#session-event-callbacks)
+  * [Device IDs](#device-ids)
+       * [iOS advertising identifier](#di-idfa)
+       * [Google Play Services advertising identifier](#di-gps-adid)
+       * [Adjust device identifier](#di-adid)
+  * [Pre-installed trackers](#pre-installed-trackers)
+  * [Disable tracking](#disable-tracking)
+  * [Offline mode](#offline-mode)
+  * [Event buffering](#event-buffering)
+  * [Background tracking](#background-tracking)
+  * [GDPR right to be forgotten](#gdpr-forget-me)
+
+### License
+
+  * [License](#license)
+      
+
+
+## <a id="early-steps"></a>Quick Start
+
+### <a id="example-app"></a>Example app
 
 There is an example app inside the [`example` directory][example-app]. You can use the example app to see how the Adjust SDK can be integrated.
 
-## <a id="basic-integration">Basic integration
+### <a id="basic-integration">Basic integration
 
 These are the minimal steps required to integrate the Adjust SDK into your Marmalade project.
 
@@ -211,433 +229,7 @@ Settings for this can also be found in `AdjustMarmalade.mkf` file of the Adjust 
 iphone-link-opts="-weak_framework AdSupport -weak_framework iAd"
 iphone-link-opts="-F$CWD/sdk/iOS -framework AdjustSdk -ObjC"
 ```
-
 If you are not running any iAd campaigns, you can feel free to remove the `iAd.framework` dependency.
-
-## <a id="additional-features"></a>Additional features
-
-You can take advantage of the following features once the Adjust SDK is integrated into your project.
-
-### <a id="event-tracking"></a>Event tracking
-
-With Adjust, you can track every event that you want. Suppose you want to track every tap on a button. Simply create a new event token in your [dashboard]. Let's say that event token is `abc123`. You can add the following line in your button’s click handler method to track the click:
-
-```cpp
-adjust_event* event = new adjust_event("abc123");
-adjust_TrackEvent(event);
-```
-
-### <a id="revenue-tracking"></a>Revenue tracking
-
-If your users can generate revenue by tapping on advertisements or making In-App Purchases, then you can track those revenues with events. Let's say a tap is worth €0.01. You could track the revenue event like this:
-
-```cpp
-adjust_event* event = new adjust_event("abc123");
-event->set_revenue(0.01, "EUR");
-
-adjust_TrackEvent(event);
-```
-
-### <a id="revenue-deduplication"></a>Revenue deduplication
-
-You can also add an optional transaction ID to avoid tracking duplicate revenues. The last ten transaction IDs are remembered, and revenue events with duplicate transaction IDs are skipped. This is especially useful for in-app purchase tracking. You can see an example below.
-
-If you want to track in-app purchases, please make sure to call the `adjust_TrackEvent` only if the transaction is finished
-and item is purchased. That way you can avoid tracking revenue that is not actually being generated.
-
-```cpp
-adjust_event* event = new adjust_event("abc123");
-
-event->set_revenue(0.01, "EUR");
-event->set_transaction_id("transaction_id");
-
-adjust_TrackEvent(event);
-```
-
-**Note**: Transaction ID is the iOS term, unique identifier for successfully finished Android In-App-Purchases is named **Order ID**.
-
-### <a id="iap-verification"></a>In-App Purchase verification
-
-In-App Purchase Verification can be done with Marmalade purchase SDK which is currently being developed and will soon be publicly available. For more information, please contact support@adjust.com.
-
-### <a id="callback-parameters"></a>Callback parameters
-
-You can also register a callback URL for that event in your [dashboard][dashboard] and we will send a GET request to that URL whenever the event gets tracked. In that case you can also put some key-value pairs in an object and pass it to the `adjust_TrackEvent` method. We will then append these named parameters to your callback URL.
-
-For example, suppose you have registered the URL `http://www.adjust.com/callback` for your event with event token `abc123` and execute the following lines:
-
-```cpp
-adjust_event* event = new adjust_event("abc123");
-
-event->add_callback_parameter("key", "value");
-event->add_callback_parameter("foo", "bar");
-
-adjust_TrackEvent(event);
-```
-
-In this case we would track the event and send a request to:
-
-```
-http://www.adjust.com/callback?key=value&foo=bar
-```
-
-It should be mentioned that we support a variety of placeholders like `{idfa}` for iOS or `{gps_adid}` for Android that can be used as parameter values.  In the resulting callback the `{idfa}` placeholder would be replaced with the ID for Advertisers of the current device for iOS and the `{gps_adid}` would be replaced with the Google Advertising ID of the current device for Android. Also note that we don't store any of your custom parameters, but only append them to your callbacks. If you haven't registered a callback for an event, these parameters won't even be read.
-
-You can read more about using URL callbacks, including a full list of available values, in our [callbacks guide][callbacks-guide].
-
-### <a id="partner-parameters"></a>Partner parameters
-
-Similarly to the callback parameters mentioned above, you can also add parameters that Adjust will transmit to the network partners of your choice. You can activate these networks in your Adjust dashboard.
-
-For partner parameters to be added, you would need to call the `add_partner_parameter` method on your `adjust_event` instance.
-
-```cpp
-adjust_event* event = new adjust_event("abc123");
-
-event->add_partner_parameter("key", "value");
-event->add_partner_parameter("foo", "bar");
-
-adjust_TrackEvent(event);
-```
-
-You can read more about special partners and networks in our [guide to special partners][special-partners].
-
-### <a id="session-parameters"></a>Session parameters
-
-Some parameters are saved to be sent in every event and session of the Adjust SDK. Once you have added any of these parameters, you don't need to add them every time, since they will be saved locally. If you add the same parameter twice, there will be no effect.
-
-These session parameters can be called before the Adjust SDK is launched to make sure they are sent even on install. If you need to send them with an install, but can only obtain the needed values after launch, it's possible to [delay](#delay-start) the first launch of the Adjust SDK to allow this behaviour.
-
-### <a id="session-callback-parameters"> Session callback parameters
-
-The same callback parameters that are registered for [events](#callback-parameters) can be also saved to be sent in every event or session of the Adjust SDK.
-
-The session callback parameters have a similar interface of the event callback parameters. Instead of adding the key and it's value to an event, it's added through a call to method `adjust_AddSessionCallbackParameter`:
-
-```cpp
-adjust_AddSessionCallbackParameter("foo", "bar");
-```
-
-The session callback parameters will be merged with the callback parameters added to an event. The callback parameters added to an event have precedence over the session callback parameters. Meaning that, when adding a callback parameter to an event with the same key to one added from the session, the value that prevails is the callback parameter added to the event.
-
-It's possible to remove a specific session callback parameter by passing the desiring key to the method `adjust_RemoveSessionCallbackParameter`.
-
-```cpp
-adjust_RemoveSessionCallbackParameter("foo");
-```
-
-If you wish to remove all key and values from the session callback parameters, you can reset it with the method `adjust_ResetSessionCallbackParameters`.
-
-```cpp
-adjust_ResetSessionCallbackParameters();
-```
-
-### <a id="session-partner-parameters">Session partner parameters
-
-In the same way that there is [session callback parameters](#session-callback-parameters) that are sent for every event or session of the Adjust SDK, there is also session partner parameters.
-
-These will be transmitted to network partners, for the integrations that have been activated in your Adjust [dashboard].
-
-The session partner parameters have a similar interface to the event partner parameters. Instead of adding the key and its value to an event, it's added through a call to method `adjust_AddSessionPartnerParameter`:
-
-```cpp
-adjust_AddSessionPartnerParameter("foo", "bar");
-```
-
-The session partner parameters will be merged with the partner parameters added to an event. The partner parameters added to an event have precedence over the session partner parameters. Meaning that, when adding a partner parameter to an event with the same key to one added from the session, the value that prevails is the partner parameter added to the event.
-
-It's possible to remove a specific session partner parameter by passing the desiring key to the method `adjust_RemoveSessionPartnerParameter`.
-
-```cpp
-adjust_RemoveSessionPartnerParameter("foo");
-```
-
-If you wish to remove all keys and values from the session partner parameters, you can reset it with the method `adjust_ResetSessionPartnerParameters`.
-
-```cpp
-adjust_ResetSessionPartnerParameters();
-```
-
-### <a id="delay-start"></a>Delay start
-
-Delaying the start of the Adjust SDK allows your app some time to obtain session parameters, such as unique identifiers, to be sent on install.
-
-Set the initial delay time in seconds with the `set_delay_start` field of the `adjust_config` instance:
-
-```cpp
-config->set_delay_start(5.5);
-```
-
-In this case this will make the Adjust SDK not send the initial install session and any event created for 5.5 seconds. After this time is expired or if you call `adjust_SendFirstPackages()` in the meanwhile, every session parameter will be added to the delayed install session and events and the Adjust SDK will resume as usual.
-
-**The maximum delay start time of the Adjust SDK is 10 seconds**.
-
-### <a id="attribution-callback"></a>Attribution callback
-
-Adjust can also send you a callback upon change of attribution. Due to the different sources considered for attribution, this information cannot be provided synchronously. Follow these steps to implement the optional callback in your application:
-
-1. Create void method which receives parameter of type `adjust_attribution_data*`.
-
-2. After creating instance of `adjust_config`, call its `set_attribution_callback` method
-with the previously created method as parameter.
-
-The callback function will get called when the SDK receives final attribution data. 
-Within the callback function you have access to the `attribution` parameter. 
-Here is a quick summary of its properties:
-
-- `char* tracker_token` the tracker token of the current attribution.
-- `char* tracker_name` the tracker name of the current attribution.
-- `char* network` the network grouping level of the current attribution.
-- `char* campaign` the campaign grouping level of the current attribution.
-- `char* ad_group` the ad group grouping level of the current attribution.
-- `char* creative` the creative grouping level of the current attribution.
-- `char* click_label` the click label of the current attribution.
-- `char* adid` the Adjust device identifier.
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_attribution_data(adjust_attribution_data* attribution) {
-    // Printing all attribution properties.
-    IwTrace(ADJUSTMARMALADE, ("Attribution changed!"));
-    IwTrace(ADJUSTMARMALADE, (attribution->tracker_token));
-    IwTrace(ADJUSTMARMALADE, (attribution->tracker_name));
-    IwTrace(ADJUSTMARMALADE, (attribution->network));
-    IwTrace(ADJUSTMARMALADE, (attribution->campaign));
-    IwTrace(ADJUSTMARMALADE, (attribution->ad_group));
-    IwTrace(ADJUSTMARMALADE, (attribution->creative));
-    IwTrace(ADJUSTMARMALADE, (attribution->click_label));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_attribution_callback(trace_attribution_data);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-Please make sure to consider [applicable attribution data policies.][attribution-data]
-
-### <a id="session-event-callbacks"></a>Session and event callbacks
-
-You can register a callback to be notified of successful and failed tracked events and/or sessions.
-
-Follow the same steps to implement the following callback function for successfully tracked events:
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_event_success_data(adjust_event_success_data* response) {
-    IwTrace(ADJUSTMARMALADE, ("Event successfully tracked!"));
-    IwTrace(ADJUSTMARMALADE, (response->message));
-    IwTrace(ADJUSTMARMALADE, (response->timestamp));
-    IwTrace(ADJUSTMARMALADE, (response->event_token));
-    IwTrace(ADJUSTMARMALADE, (response->adid));
-    IwTrace(ADJUSTMARMALADE, (response->json_response));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_event_success_callback(trace_event_success_data);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-The following callback function for failed tracked events:
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_event_failure_data(adjust_event_failure_data* response) {
-    IwTrace(ADJUSTMARMALADE, ("Event tracking failed!"));
-    IwTrace(ADJUSTMARMALADE, (response->message));
-    IwTrace(ADJUSTMARMALADE, (response->timestamp));
-    IwTrace(ADJUSTMARMALADE, (response->event_token));
-    IwTrace(ADJUSTMARMALADE, (response->adid));
-    IwTrace(ADJUSTMARMALADE, (response->will_retry));
-    IwTrace(ADJUSTMARMALADE, (response->json_response));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_event_failure_callback(trace_event_failure_data);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-For successfully tracked sessions:
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_session_success_data(adjust_session_success_data* response) {
-    IwTrace(ADJUSTMARMALADE, ("Session successfully tracked!"));
-    IwTrace(ADJUSTMARMALADE, (response->message));
-    IwTrace(ADJUSTMARMALADE, (response->timestamp));
-    IwTrace(ADJUSTMARMALADE, (response->adid));
-    IwTrace(ADJUSTMARMALADE, (response->json_response));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_session_success_callback(trace_session_success_data);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-And for failed tracked sessions:
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_session_failure_data(adjust_session_failure_data* response) {
-    IwTrace(ADJUSTMARMALADE, ("Session tracking failed!"));
-    IwTrace(ADJUSTMARMALADE, (response->message));
-    IwTrace(ADJUSTMARMALADE, (response->timestamp));
-    IwTrace(ADJUSTMARMALADE, (response->adid));
-    IwTrace(ADJUSTMARMALADE, (response->will_retry));
-    IwTrace(ADJUSTMARMALADE, (response->json_response));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_session_failure_callback(trace_session_failure_data);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-The callback functions will be called after the SDK tries to send a package to the server. Within the callback you have access to a response data object specifically for the callback. Here is a quick summary of the session response data properties:
-
-- `const char* message` the message from the server or the error logged by the SDK.
-- `const char* timestamp` timestamp from the server.
-- `const char* adid` a unique device identifier provided by Adjust.
-- `const char* jsonResponse` the JSON object with the response from the server.
-
-Both event response data objects contain:
-
-- `const char* eventToken` the event token, if the package tracked was an event.
-
-And both event and session failed objects also contain:
-
-- `const char* willRetry` indicates there will be an attempt to resend the package at a later time.
-
-### <a id="disable-tracking"></a>Disable tracking
-
-You can disable the Adjust SDK from tracking by invoking the method `adjust_SetEnabled` with the enabled parameter as `false`. This setting is **remembered between sessions**, but it can only be activated after the first session.
-
-```cpp
-adjust_SetEnabled(false);
-```
-
-You can verify if the Adjust SDK is currently active with the method `adjust_IsEnabled`. It is always possible to activate the Adjust SDK by invoking `adjust_SetEnabled` with the parameter set to `true`.
-
-### <a id="offline-mode"></a>Offline mode
-
-You can put the Adjust SDK in offline mode to suspend transmission to our servers while retaining tracked data to be sent later. When in offline mode, all information is saved in a file, so be careful not to trigger too many events while in offline mode.
-
-You can activate offline mode by calling `adjust_SetOfflineMode` with the parameter `true`.
-
-```cpp
-adjust_SetOfflineMode(true);
-```
-
-Conversely, you can deactivate offline mode by calling `adjust_SetOfflineMode` with `false`. When the Adjust SDK is put back in online mode, all saved information is send to our servers with the correct time information.
-
-Unlike disabling tracking, **this setting is not remembered** between sessions. This means that the SDK is in online mode whenever it is started, even if the app was terminated in offline mode.
-
-### <a id="event-buffering"></a>Event buffering
-
-If your app makes heavy use of event tracking, you might want to delay some HTTP requests in order to send them in one batch every minute. You can enable event buffering with your `adjust_config` instance by calling `set_event_buffering_enabled` method:
-
-```cpp
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_event_buffering_enabled(true);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-If nothing set, event buffering is **disabled by default**.
-
-### <a id="gdpr-forget-me"></a>GDPR right to be forgotten
-
-In accordance with article 17 of the EU's General Data Protection Regulation (GDPR), you can notify Adjust when a user has exercised their right to be forgotten. Calling the following method will instruct the Adjust SDK to communicate the user's choice to be forgotten to the Adjust backend:
-
-```cpp
-adjust_GdprForgetMe();
-```
-
-Upon receiving this information, Adjust will erase the user's data and the Adjust SDK will stop tracking the user. No requests from this device will be sent to Adjust in the future.
 
 ### <a id="sdk-signature"></a>SDK signature
 
@@ -663,174 +255,7 @@ int main() {
 }
 ```
 
-### <a id="background-tracking"></a>Background tracking
-
-The default behaviour of the Adjust SDK is to **pause sending HTTP requests while the app is in the background**. You can change this in your `adjust_config` instance by calling `set_is_sending_in_background_enabled` method:
-
-```cpp
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_is_sending_in_background_enabled(true);
-    
-    adjust_Start(config);
-
-    // ...
-}
-```
-
-If nothing is set, sending in background is **disabled by default**.
-
-### <a id="device-ids"></a>Device IDs
-
-Certain services (such as Google Analytics) require you to coordinate Device and Client IDs in order to prevent duplicate reporting.
-
-### <a id="di-idfa">iOS advertising identifier
-
-You can access the IDFA value of an iOS device by setting the appropriate callback method on the `adjust_config` object and invoking the `adjust_GetIdfa` method:
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_idfa_data(const char* response) {
-    IwTrace(ADJUSTMARMALADE, ("IDFA received!"));
-    IwTrace(ADJUSTMARMALADE, (response));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_idfa_callback(trace_idfa_data);
-    
-    adjust_Start(config);
-
-    // ...
-    
-    adjust_GetIdfa();
-    
-    // ...
-}
-```
-
-### <a id="di-gps-adid"></a>Google Play Services advertising identifier
-
-The Adjust SDK provides you with the possibility to read the Google advertising identifier of the Android device on which your app is running. In order to do this, set the callback method on the `adjust_config` object which receives the `const char*` parameter. After setting this, if you invoke the `adjust_GetGoogleAdId` method, you will receive the Google advertising identifier value in your callback method:
-
-```cpp
-#include "AdjustMarmalade.h"
-
-//...
-
-static void trace_google_ad_id_data(const char* response) {
-    IwTrace(ADJUSTMARMALADE, ("Google Advertising Identifier received!"));
-    IwTrace(ADJUSTMARMALADE, (response));
-}
-
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_google_ad_id_callback(trace_google_ad_id_data);
-    
-    adjust_Start(config);
-
-    // ...
-    
-    adjust_GetGoogleAdId();
-    
-    // ...
-}
-```
-
-### <a id="di-adid"></a>Adjust device identifier
-
-For every device with your app installed on it, the Adjust backend generates a unique **Adjust device identifier** (**adid**). In order to obtain this identifier, call the `adjust_GetAdid` method:
-
-```cpp
-char* adid;
-
-adjust_GetAdid(&adid);
-
-IwTrace(ADJUSTMARMALADE, (adid));
-```
-
-**Note**: Information about the **adid** is only available after an app installation has been tracked by the Adjust backend. From that moment on, the Adjust SDK has information about the device **adid** and you can access it with this method. So, **it is not possible** to access the **adid** value before the SDK has been initialised and installation of your app has been successfully tracked.
-
-### <a id="user-attribution"></a>User attribution
-
-As described in the [attribution callback section](#attribution-callback), this callback is triggered, providing you with information about a new attribution whenever it changes. If you want to access information about a user's current attribution whenever you need it, you can make a call to the `adjust_GetAttribution` method:
-
-```cpp
-adjust_attribution_data* attribution = new adjust_attribution_data();
-adjust_GetAttribution(attribution);
-
-IwTrace(ADJUSTMARMALADE, (attribution->tracker_token));
-IwTrace(ADJUSTMARMALADE, (attribution->tracker_name));
-IwTrace(ADJUSTMARMALADE, (attribution->network));
-IwTrace(ADJUSTMARMALADE, (attribution->campaign));
-IwTrace(ADJUSTMARMALADE, (attribution->ad_group));
-IwTrace(ADJUSTMARMALADE, (attribution->creative));
-IwTrace(ADJUSTMARMALADE, (attribution->click_label));
-IwTrace(ADJUSTMARMALADE, (attribution->adid));
-```
-
-**Note**: Information about current attribution is only available after an app installation has been tracked by the Adjust backend and the attribution callback has been triggered. From that moment on, the Adjust SDK has information about a user's attribution and you can access it with this method. So, **it is not possible** to access a user's attribution value before the SDK has been initialised and an attribution callback has been triggered.
-
-### <a id="push-token"></a>Push token
-
-To send us the push notification token, please call `adjust_SetDeviceToken` method **when you obtain your app's push notification token and when ever it changes it's value**:
-
-```cpp
-adjust_SetDeviceToken("YourPushNotificationToken");
-```
-
-Push tokens are used for Audience Builder and client callbacks, and they are required for the upcoming uninstall tracking feature.
-
-### <a id="pre-installed-trackers"></a>Pre-installed trackers
-
-If you want to use the Adjust SDK to recognize users that found your app pre-installed on their device, follow these steps.
-
-1. Create a new tracker in your [dashboard].
-2. Open your app delegate and add set the default tracker of your `adjust_config` instance:
-
-    ```cpp
-    adjust_config* config = new adjust_config(app_token, environment);
-
-    config->set_default_tracker("{TrackerToken}");
-    
-    adjust_Start(config);
-    ```
-
-  Replace `{TrackerToken}` with the tracker token you created in step 2. Please note that the dashboard displays a tracker 
-  URL (including `http://app.adjust.com/`). In your source code, you should specify only the six-character token and not the
-  entire URL.
-
-3. Build and run your app. You should see a line like the following in the app's log output:
-
-    ```
-    Default tracker: 'abc123'
-    ```
-
-### <a id="deeplinking"></a>Deep linking
+## <a id="deeplinking"></a>Deep linking
 
 If you are using the Adjust tracker URL with an option to deep link into your app from the URL, there is the possibility to 
 get info about the deep link URL and its content. Hitting the URL can happen when the user has your app already installed 
@@ -1029,6 +454,606 @@ The Adjust SDK supports this feature out of the box and no additional setup is n
 [universal-links-guide]:        https://github.com/adjust/ios_sdk/#deeplinking-setup-new
 [broadcast-receiver-custom]:    https://github.com/adjust/android_sdk/blob/master/doc/english/referrer.md
 [reattribution-with-deeplinks]: https://docs.adjust.com/en/deeplinking/#manually-appending-attribution-data-to-a-deep-link
+
+
+## <a id="event-tracking"></a>Event tracking
+
+With Adjust, you can track every event that you want. Suppose you want to track every tap on a button. Simply create a new event token in your [dashboard]. Let's say that event token is `abc123`. You can add the following line in your button’s click handler method to track the click:
+
+```cpp
+adjust_event* event = new adjust_event("abc123");
+adjust_TrackEvent(event);
+```
+
+### <a id="revenue-tracking"></a>Revenue tracking
+
+If your users can generate revenue by tapping on advertisements or making In-App Purchases, then you can track those revenues with events. Let's say a tap is worth €0.01. You could track the revenue event like this:
+
+```cpp
+adjust_event* event = new adjust_event("abc123");
+event->set_revenue(0.01, "EUR");
+
+adjust_TrackEvent(event);
+```
+
+### <a id="revenue-deduplication"></a>Revenue deduplication
+
+You can also add an optional transaction ID to avoid tracking duplicate revenues. The last ten transaction IDs are remembered, and revenue events with duplicate transaction IDs are skipped. This is especially useful for in-app purchase tracking. You can see an example below.
+
+If you want to track in-app purchases, please make sure to call the `adjust_TrackEvent` only if the transaction is finished
+and item is purchased. That way you can avoid tracking revenue that is not actually being generated.
+
+```cpp
+adjust_event* event = new adjust_event("abc123");
+
+event->set_revenue(0.01, "EUR");
+event->set_transaction_id("transaction_id");
+
+adjust_TrackEvent(event);
+```
+
+**Note**: Transaction ID is the iOS term, unique identifier for successfully finished Android In-App-Purchases is named **Order ID**.
+
+### <a id="iap-verification"></a>In-App Purchase verification
+
+In-App Purchase Verification can be done with Marmalade purchase SDK which is currently being developed and will soon be publicly available. For more information, please contact support@adjust.com.
+
+
+## <a id="early-steps"></a>Custom Parameters
+
+### <a id="callback-parameters"></a>Callback parameters
+
+You can also register a callback URL for that event in your [dashboard][dashboard] and we will send a GET request to that URL whenever the event gets tracked. In that case you can also put some key-value pairs in an object and pass it to the `adjust_TrackEvent` method. We will then append these named parameters to your callback URL.
+
+For example, suppose you have registered the URL `http://www.adjust.com/callback` for your event with event token `abc123` and execute the following lines:
+
+```cpp
+adjust_event* event = new adjust_event("abc123");
+
+event->add_callback_parameter("key", "value");
+event->add_callback_parameter("foo", "bar");
+
+adjust_TrackEvent(event);
+```
+
+In this case we would track the event and send a request to:
+
+```
+http://www.adjust.com/callback?key=value&foo=bar
+```
+
+It should be mentioned that we support a variety of placeholders like `{idfa}` for iOS or `{gps_adid}` for Android that can be used as parameter values.  In the resulting callback the `{idfa}` placeholder would be replaced with the ID for Advertisers of the current device for iOS and the `{gps_adid}` would be replaced with the Google Advertising ID of the current device for Android. Also note that we don't store any of your custom parameters, but only append them to your callbacks. If you haven't registered a callback for an event, these parameters won't even be read.
+
+You can read more about using URL callbacks, including a full list of available values, in our [callbacks guide][callbacks-guide].
+
+### <a id="partner-parameters"></a>Partner parameters
+
+Similarly to the callback parameters mentioned above, you can also add parameters that Adjust will transmit to the network partners of your choice. You can activate these networks in your Adjust dashboard.
+
+For partner parameters to be added, you would need to call the `add_partner_parameter` method on your `adjust_event` instance.
+
+```cpp
+adjust_event* event = new adjust_event("abc123");
+
+event->add_partner_parameter("key", "value");
+event->add_partner_parameter("foo", "bar");
+
+adjust_TrackEvent(event);
+```
+
+You can read more about special partners and networks in our [guide to special partners][special-partners].
+
+### <a id="session-parameters"></a>Session parameters
+
+Some parameters are saved to be sent in every event and session of the Adjust SDK. Once you have added any of these parameters, you don't need to add them every time, since they will be saved locally. If you add the same parameter twice, there will be no effect.
+
+These session parameters can be called before the Adjust SDK is launched to make sure they are sent even on install. If you need to send them with an install, but can only obtain the needed values after launch, it's possible to [delay](#delay-start) the first launch of the Adjust SDK to allow this behaviour.
+
+### <a id="session-callback-parameters"></a> Session callback parameters
+
+The same callback parameters that are registered for [events](#callback-parameters) can be also saved to be sent in every event or session of the Adjust SDK.
+
+The session callback parameters have a similar interface of the event callback parameters. Instead of adding the key and it's value to an event, it's added through a call to method `adjust_AddSessionCallbackParameter`:
+
+```cpp
+adjust_AddSessionCallbackParameter("foo", "bar");
+```
+
+The session callback parameters will be merged with the callback parameters added to an event. The callback parameters added to an event have precedence over the session callback parameters. Meaning that, when adding a callback parameter to an event with the same key to one added from the session, the value that prevails is the callback parameter added to the event.
+
+It's possible to remove a specific session callback parameter by passing the desiring key to the method `adjust_RemoveSessionCallbackParameter`.
+
+```cpp
+adjust_RemoveSessionCallbackParameter("foo");
+```
+
+If you wish to remove all key and values from the session callback parameters, you can reset it with the method `adjust_ResetSessionCallbackParameters`.
+
+```cpp
+adjust_ResetSessionCallbackParameters();
+```
+
+### <a id="session-partner-parameters"></a>Session partner parameters
+
+In the same way that there is [session callback parameters](#session-callback-parameters) that are sent for every event or session of the Adjust SDK, there is also session partner parameters.
+
+These will be transmitted to network partners, for the integrations that have been activated in your Adjust [dashboard].
+
+The session partner parameters have a similar interface to the event partner parameters. Instead of adding the key and its value to an event, it's added through a call to method `adjust_AddSessionPartnerParameter`:
+
+```cpp
+adjust_AddSessionPartnerParameter("foo", "bar");
+```
+
+The session partner parameters will be merged with the partner parameters added to an event. The partner parameters added to an event have precedence over the session partner parameters. Meaning that, when adding a partner parameter to an event with the same key to one added from the session, the value that prevails is the partner parameter added to the event.
+
+It's possible to remove a specific session partner parameter by passing the desiring key to the method `adjust_RemoveSessionPartnerParameter`.
+
+```cpp
+adjust_RemoveSessionPartnerParameter("foo");
+```
+
+If you wish to remove all keys and values from the session partner parameters, you can reset it with the method `adjust_ResetSessionPartnerParameters`.
+
+```cpp
+adjust_ResetSessionPartnerParameters();
+```
+
+### <a id="delay-start"></a>Delay start
+
+Delaying the start of the Adjust SDK allows your app some time to obtain session parameters, such as unique identifiers, to be sent on install.
+
+Set the initial delay time in seconds with the `set_delay_start` field of the `adjust_config` instance:
+
+```cpp
+config->set_delay_start(5.5);
+```
+
+In this case this will make the Adjust SDK not send the initial install session and any event created for 5.5 seconds. After this time is expired or if you call `adjust_SendFirstPackages()` in the meanwhile, every session parameter will be added to the delayed install session and events and the Adjust SDK will resume as usual.
+
+**The maximum delay start time of the Adjust SDK is 10 seconds**.
+
+
+## <a id="additional-features"></a>Additional features
+
+You can take advantage of the following features once the Adjust SDK is integrated into your project.
+
+### <a id="push-token"></a>Push token
+
+To send us the push notification token, please call `adjust_SetDeviceToken` method **when you obtain your app's push notification token and when ever it changes it's value**:
+
+```cpp
+adjust_SetDeviceToken("YourPushNotificationToken");
+```
+
+Push tokens are used for Audience Builder and client callbacks, and they are required for the upcoming uninstall tracking feature.
+
+### <a id="attribution-callback"></a>Attribution callback
+
+Adjust can also send you a callback upon change of attribution. Due to the different sources considered for attribution, this information cannot be provided synchronously. Follow these steps to implement the optional callback in your application:
+
+1. Create void method which receives parameter of type `adjust_attribution_data*`.
+
+2. After creating instance of `adjust_config`, call its `set_attribution_callback` method
+with the previously created method as parameter.
+
+The callback function will get called when the SDK receives final attribution data. 
+Within the callback function you have access to the `attribution` parameter. 
+Here is a quick summary of its properties:
+
+- `char* tracker_token` the tracker token of the current attribution.
+- `char* tracker_name` the tracker name of the current attribution.
+- `char* network` the network grouping level of the current attribution.
+- `char* campaign` the campaign grouping level of the current attribution.
+- `char* ad_group` the ad group grouping level of the current attribution.
+- `char* creative` the creative grouping level of the current attribution.
+- `char* click_label` the click label of the current attribution.
+- `char* adid` the Adjust device identifier.
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_attribution_data(adjust_attribution_data* attribution) {
+    // Printing all attribution properties.
+    IwTrace(ADJUSTMARMALADE, ("Attribution changed!"));
+    IwTrace(ADJUSTMARMALADE, (attribution->tracker_token));
+    IwTrace(ADJUSTMARMALADE, (attribution->tracker_name));
+    IwTrace(ADJUSTMARMALADE, (attribution->network));
+    IwTrace(ADJUSTMARMALADE, (attribution->campaign));
+    IwTrace(ADJUSTMARMALADE, (attribution->ad_group));
+    IwTrace(ADJUSTMARMALADE, (attribution->creative));
+    IwTrace(ADJUSTMARMALADE, (attribution->click_label));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_attribution_callback(trace_attribution_data);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+Please make sure to consider [applicable attribution data policies.][attribution-data]
+
+### <a id="user-attribution"></a>User attribution
+
+As described in the [attribution callback section](#attribution-callback), this callback is triggered, providing you with information about a new attribution whenever it changes. If you want to access information about a user's current attribution whenever you need it, you can make a call to the `adjust_GetAttribution` method:
+
+```cpp
+adjust_attribution_data* attribution = new adjust_attribution_data();
+adjust_GetAttribution(attribution);
+
+IwTrace(ADJUSTMARMALADE, (attribution->tracker_token));
+IwTrace(ADJUSTMARMALADE, (attribution->tracker_name));
+IwTrace(ADJUSTMARMALADE, (attribution->network));
+IwTrace(ADJUSTMARMALADE, (attribution->campaign));
+IwTrace(ADJUSTMARMALADE, (attribution->ad_group));
+IwTrace(ADJUSTMARMALADE, (attribution->creative));
+IwTrace(ADJUSTMARMALADE, (attribution->click_label));
+IwTrace(ADJUSTMARMALADE, (attribution->adid));
+```
+
+**Note**: Information about current attribution is only available after an app installation has been tracked by the Adjust backend and the attribution callback has been triggered. From that moment on, the Adjust SDK has information about a user's attribution and you can access it with this method. So, **it is not possible** to access a user's attribution value before the SDK has been initialised and an attribution callback has been triggered.
+
+
+### <a id="session-event-callbacks"></a>Session and event callbacks
+
+You can register a callback to be notified of successful and failed tracked events and/or sessions.
+
+Follow the same steps to implement the following callback function for successfully tracked events:
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_event_success_data(adjust_event_success_data* response) {
+    IwTrace(ADJUSTMARMALADE, ("Event successfully tracked!"));
+    IwTrace(ADJUSTMARMALADE, (response->message));
+    IwTrace(ADJUSTMARMALADE, (response->timestamp));
+    IwTrace(ADJUSTMARMALADE, (response->event_token));
+    IwTrace(ADJUSTMARMALADE, (response->adid));
+    IwTrace(ADJUSTMARMALADE, (response->json_response));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_event_success_callback(trace_event_success_data);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+The following callback function for failed tracked events:
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_event_failure_data(adjust_event_failure_data* response) {
+    IwTrace(ADJUSTMARMALADE, ("Event tracking failed!"));
+    IwTrace(ADJUSTMARMALADE, (response->message));
+    IwTrace(ADJUSTMARMALADE, (response->timestamp));
+    IwTrace(ADJUSTMARMALADE, (response->event_token));
+    IwTrace(ADJUSTMARMALADE, (response->adid));
+    IwTrace(ADJUSTMARMALADE, (response->will_retry));
+    IwTrace(ADJUSTMARMALADE, (response->json_response));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_event_failure_callback(trace_event_failure_data);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+For successfully tracked sessions:
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_session_success_data(adjust_session_success_data* response) {
+    IwTrace(ADJUSTMARMALADE, ("Session successfully tracked!"));
+    IwTrace(ADJUSTMARMALADE, (response->message));
+    IwTrace(ADJUSTMARMALADE, (response->timestamp));
+    IwTrace(ADJUSTMARMALADE, (response->adid));
+    IwTrace(ADJUSTMARMALADE, (response->json_response));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_session_success_callback(trace_session_success_data);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+And for failed tracked sessions:
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_session_failure_data(adjust_session_failure_data* response) {
+    IwTrace(ADJUSTMARMALADE, ("Session tracking failed!"));
+    IwTrace(ADJUSTMARMALADE, (response->message));
+    IwTrace(ADJUSTMARMALADE, (response->timestamp));
+    IwTrace(ADJUSTMARMALADE, (response->adid));
+    IwTrace(ADJUSTMARMALADE, (response->will_retry));
+    IwTrace(ADJUSTMARMALADE, (response->json_response));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_session_failure_callback(trace_session_failure_data);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+The callback functions will be called after the SDK tries to send a package to the server. Within the callback you have access to a response data object specifically for the callback. Here is a quick summary of the session response data properties:
+
+- `const char* message` the message from the server or the error logged by the SDK.
+- `const char* timestamp` timestamp from the server.
+- `const char* adid` a unique device identifier provided by Adjust.
+- `const char* jsonResponse` the JSON object with the response from the server.
+
+Both event response data objects contain:
+
+- `const char* eventToken` the event token, if the package tracked was an event.
+
+And both event and session failed objects also contain:
+
+- `const char* willRetry` indicates there will be an attempt to resend the package at a later time.
+
+
+### <a id="device-ids"></a>Device IDs
+
+Certain services (such as Google Analytics) require you to coordinate Device and Client IDs in order to prevent duplicate reporting.
+
+### <a id="di-idfa">iOS advertising identifier
+
+You can access the IDFA value of an iOS device by setting the appropriate callback method on the `adjust_config` object and invoking the `adjust_GetIdfa` method:
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_idfa_data(const char* response) {
+    IwTrace(ADJUSTMARMALADE, ("IDFA received!"));
+    IwTrace(ADJUSTMARMALADE, (response));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_idfa_callback(trace_idfa_data);
+    
+    adjust_Start(config);
+
+    // ...
+    
+    adjust_GetIdfa();
+    
+    // ...
+}
+```
+
+### <a id="di-gps-adid"></a>Google Play Services advertising identifier
+
+The Adjust SDK provides you with the possibility to read the Google advertising identifier of the Android device on which your app is running. In order to do this, set the callback method on the `adjust_config` object which receives the `const char*` parameter. After setting this, if you invoke the `adjust_GetGoogleAdId` method, you will receive the Google advertising identifier value in your callback method:
+
+```cpp
+#include "AdjustMarmalade.h"
+
+//...
+
+static void trace_google_ad_id_data(const char* response) {
+    IwTrace(ADJUSTMARMALADE, ("Google Advertising Identifier received!"));
+    IwTrace(ADJUSTMARMALADE, (response));
+}
+
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_google_ad_id_callback(trace_google_ad_id_data);
+    
+    adjust_Start(config);
+
+    // ...
+    
+    adjust_GetGoogleAdId();
+    
+    // ...
+}
+```
+
+### <a id="di-adid"></a>Adjust device identifier
+
+For every device with your app installed on it, the Adjust backend generates a unique **Adjust device identifier** (**adid**). In order to obtain this identifier, call the `adjust_GetAdid` method:
+
+```cpp
+char* adid;
+
+adjust_GetAdid(&adid);
+
+IwTrace(ADJUSTMARMALADE, (adid));
+```
+
+### <a id="pre-installed-trackers"></a>Pre-installed trackers
+
+If you want to use the Adjust SDK to recognize users that found your app pre-installed on their device, follow these steps.
+
+1. Create a new tracker in your [dashboard].
+2. Open your app delegate and add set the default tracker of your `adjust_config` instance:
+
+    ```cpp
+    adjust_config* config = new adjust_config(app_token, environment);
+
+    config->set_default_tracker("{TrackerToken}");
+    
+    adjust_Start(config);
+    ```
+
+  Replace `{TrackerToken}` with the tracker token you created in step 2. Please note that the dashboard displays a tracker 
+  URL (including `http://app.adjust.com/`). In your source code, you should specify only the six-character token and not the
+  entire URL.
+
+3. Build and run your app. You should see a line like the following in the app's log output:
+
+    ```
+    Default tracker: 'abc123'
+    ```
+
+**Note**: Information about the **adid** is only available after an app installation has been tracked by the Adjust backend. From that moment on, the Adjust SDK has information about the device **adid** and you can access it with this method. So, **it is not possible** to access the **adid** value before the SDK has been initialised and installation of your app has been successfully tracked.
+
+### <a id="disable-tracking"></a>Disable tracking
+
+You can disable the Adjust SDK from tracking by invoking the method `adjust_SetEnabled` with the enabled parameter as `false`. This setting is **remembered between sessions**, but it can only be activated after the first session.
+
+```cpp
+adjust_SetEnabled(false);
+```
+
+You can verify if the Adjust SDK is currently active with the method `adjust_IsEnabled`. It is always possible to activate the Adjust SDK by invoking `adjust_SetEnabled` with the parameter set to `true`.
+
+### <a id="offline-mode"></a>Offline mode
+
+You can put the Adjust SDK in offline mode to suspend transmission to our servers while retaining tracked data to be sent later. When in offline mode, all information is saved in a file, so be careful not to trigger too many events while in offline mode.
+
+You can activate offline mode by calling `adjust_SetOfflineMode` with the parameter `true`.
+
+```cpp
+adjust_SetOfflineMode(true);
+```
+
+Conversely, you can deactivate offline mode by calling `adjust_SetOfflineMode` with `false`. When the Adjust SDK is put back in online mode, all saved information is send to our servers with the correct time information.
+
+Unlike disabling tracking, **this setting is not remembered** between sessions. This means that the SDK is in online mode whenever it is started, even if the app was terminated in offline mode.
+
+### <a id="event-buffering"></a>Event buffering
+
+If your app makes heavy use of event tracking, you might want to delay some HTTP requests in order to send them in one batch every minute. You can enable event buffering with your `adjust_config` instance by calling `set_event_buffering_enabled` method:
+
+```cpp
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_event_buffering_enabled(true);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+If nothing set, event buffering is **disabled by default**.
+
+### <a id="background-tracking"></a>Background tracking
+
+The default behaviour of the Adjust SDK is to **pause sending HTTP requests while the app is in the background**. You can change this in your `adjust_config` instance by calling `set_is_sending_in_background_enabled` method:
+
+```cpp
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_is_sending_in_background_enabled(true);
+    
+    adjust_Start(config);
+
+    // ...
+}
+```
+
+If nothing is set, sending in background is **disabled by default**.
+
+### <a id="gdpr-forget-me"></a>GDPR right to be forgotten
+
+In accordance with article 17 of the EU's General Data Protection Regulation (GDPR), you can notify Adjust when a user has exercised their right to be forgotten. Calling the following method will instruct the Adjust SDK to communicate the user's choice to be forgotten to the Adjust backend:
+
+```cpp
+adjust_GdprForgetMe();
+```
+
+Upon receiving this information, Adjust will erase the user's data and the Adjust SDK will stop tracking the user. No requests from this device will be sent to Adjust in the future.
+
 
 ## <a id="license"></a>License
 
