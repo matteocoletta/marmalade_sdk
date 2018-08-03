@@ -35,9 +35,10 @@ This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [ad
        * [In-App Purchase verification](#iap-verification)
     
 ### Custom Parameters
-     
-  * [Callback parameters](#callback-parameters)
-  * [Partner parameters](#partner-parameters)
+
+  * [Event Parameters](#event-parameters)
+       * [Callback parameters](#callback-parameters)
+       * [Partner parameters](#partner-parameters)
   * [Session parameters](#session-parameters)
        * [Session callback parameters](#session-callback-parameters)
        * [Session partner parameters](#session-partner-parameters)
@@ -500,6 +501,12 @@ In-App Purchase Verification can be done with Marmalade purchase SDK which is cu
 
 
 ## <a id="early-steps"></a>Custom Parameters
+
+### <a id="event-parameters"></a>Event parameters
+
+In addition to the data points that Adjust collects [by default](https://partners.adjust.com/placeholders/), you can use the Adjust SDK to track and add to the events as many custom values as you need (user IDs, product IDs...). Custom parameters are only available as raw data (i.e., they won't appear in the Adjust dashboard).
+
+You should use Callback parameters for the values that you collect for your own internal use, and Partner parameters for those that you wish to share with external partners. If a value (e.g. product ID) is tracked both for internal use and to forward it to external partners, the best practice would be to track it both as callback and partner parameter.
 
 ### <a id="callback-parameters"></a>Callback parameters
 
