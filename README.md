@@ -61,11 +61,7 @@ This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [ad
   * [Background tracking](#background-tracking)
   * [GDPR right to be forgotten](#gdpr-forget-me)
 
-### License
-
-  * [License](#license)
-      
-
+### [License](#license)
 
 ## <a id="early-steps"></a>Quick Start
 
