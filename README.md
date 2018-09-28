@@ -2,6 +2,8 @@
 
 This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [adjust.com].
 
+---
+
 ### Quick Start
 
   * [Example app](#example-app)
@@ -62,6 +64,8 @@ This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [ad
   * [GDPR right to be forgotten](#gdpr-forget-me)
 
 ### [License](#license)
+
+---
 
 ## <a id="early-steps"></a>Quick Start
 
