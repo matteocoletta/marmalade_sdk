@@ -57,10 +57,10 @@ This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [ad
        * [Google Play Services advertising identifier](#di-gps-adid)
        * [Adjust device identifier](#di-adid)
   * [Pre-installed trackers](#pre-installed-trackers)
-  * [Disable tracking](#disable-tracking)
-  * [Offline mode](#offline-mode)
-  * [Event buffering](#event-buffering)
   * [Background tracking](#background-tracking)
+  * [Event buffering](#event-buffering)
+  * [Offline mode](#offline-mode)
+  * [Disable tracking](#disable-tracking)
   * [GDPR right to be forgotten](#gdpr-forget-me)
 
 ### [License](#license)
