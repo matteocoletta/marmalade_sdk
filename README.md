@@ -979,29 +979,29 @@ If you want to use the Adjust SDK to recognize users that found your app pre-ins
 
 **Note**: Information about the **adid** is only available after an app installation has been tracked by the Adjust backend. From that moment on, the Adjust SDK has information about the device **adid** and you can access it with this method. So, **it is not possible** to access the **adid** value before the SDK has been initialised and installation of your app has been successfully tracked.
 
-### <a id="disable-tracking"></a>Disable tracking
+### <a id="background-tracking"></a>Background tracking
 
-You can disable the Adjust SDK from tracking by invoking the method `adjust_SetEnabled` with the enabled parameter as `false`. This setting is **remembered between sessions**, but it can only be activated after the first session.
-
-```cpp
-adjust_SetEnabled(false);
-```
-
-You can verify if the Adjust SDK is currently active with the method `adjust_IsEnabled`. It is always possible to activate the Adjust SDK by invoking `adjust_SetEnabled` with the parameter set to `true`.
-
-### <a id="offline-mode"></a>Offline mode
-
-You can put the Adjust SDK in offline mode to suspend transmission to our servers while retaining tracked data to be sent later. When in offline mode, all information is saved in a file, so be careful not to trigger too many events while in offline mode.
-
-You can activate offline mode by calling `adjust_SetOfflineMode` with the parameter `true`.
+The default behaviour of the Adjust SDK is to **pause sending HTTP requests while the app is in the background**. You can change this in your `adjust_config` instance by calling `set_is_sending_in_background_enabled` method:
 
 ```cpp
-adjust_SetOfflineMode(true);
+// ...
+
+int main() {
+    const char* app_token = "{YourAppToken}";
+    const char* environment = "sandbox";
+    const char* log_level = "verbose";
+
+    adjust_config* config = new adjust_config(app_token, environment);
+    config->set_log_level(log_level);
+    config->set_is_sending_in_background_enabled(true);
+    
+    adjust_Start(config);
+
+    // ...
+}
 ```
 
-Conversely, you can deactivate offline mode by calling `adjust_SetOfflineMode` with `false`. When the Adjust SDK is put back in online mode, all saved information is send to our servers with the correct time information.
-
-Unlike disabling tracking, **this setting is not remembered** between sessions. This means that the SDK is in online mode whenever it is started, even if the app was terminated in offline mode.
+If nothing is set, sending in background is **disabled by default**.
 
 ### <a id="event-buffering"></a>Event buffering
 
@@ -1027,29 +1027,29 @@ int main() {
 
 If nothing set, event buffering is **disabled by default**.
 
-### <a id="background-tracking"></a>Background tracking
+### <a id="offline-mode"></a>Offline mode
 
-The default behaviour of the Adjust SDK is to **pause sending HTTP requests while the app is in the background**. You can change this in your `adjust_config` instance by calling `set_is_sending_in_background_enabled` method:
+You can put the Adjust SDK in offline mode to suspend transmission to our servers while retaining tracked data to be sent later. When in offline mode, all information is saved in a file, so be careful not to trigger too many events while in offline mode.
+
+You can activate offline mode by calling `adjust_SetOfflineMode` with the parameter `true`.
 
 ```cpp
-// ...
-
-int main() {
-    const char* app_token = "{YourAppToken}";
-    const char* environment = "sandbox";
-    const char* log_level = "verbose";
-
-    adjust_config* config = new adjust_config(app_token, environment);
-    config->set_log_level(log_level);
-    config->set_is_sending_in_background_enabled(true);
-    
-    adjust_Start(config);
-
-    // ...
-}
+adjust_SetOfflineMode(true);
 ```
 
-If nothing is set, sending in background is **disabled by default**.
+Conversely, you can deactivate offline mode by calling `adjust_SetOfflineMode` with `false`. When the Adjust SDK is put back in online mode, all saved information is send to our servers with the correct time information.
+
+Unlike disabling tracking, **this setting is not remembered** between sessions. This means that the SDK is in online mode whenever it is started, even if the app was terminated in offline mode.
+
+### <a id="disable-tracking"></a>Disable tracking
+
+You can disable the Adjust SDK from tracking by invoking the method `adjust_SetEnabled` with the enabled parameter as `false`. This setting is **remembered between sessions**, but it can only be activated after the first session.
+
+```cpp
+adjust_SetEnabled(false);
+```
+
+You can verify if the Adjust SDK is currently active with the method `adjust_IsEnabled`. It is always possible to activate the Adjust SDK by invoking `adjust_SetEnabled` with the parameter set to `true`.
 
 ### <a id="gdpr-forget-me"></a>GDPR right to be forgotten
 
