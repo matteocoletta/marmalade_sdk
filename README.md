@@ -48,7 +48,7 @@ This is the Marmalade SDK of Adjust™. You can read more about Adjust™ at [ad
   
 ### Additional Features
 
-  * [Push token](#push-token)
+  * [Push token (Uninstall/Reinstall tracking)](#push-token)
   * [Attribution callback](#attribution-callback)
   * [User attribution](#user-attribution)
   * [Session and event callbacks](#session-event-callbacks)
